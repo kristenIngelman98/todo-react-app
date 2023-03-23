@@ -7,7 +7,7 @@ interface Props {
     change: Dispatch<SetStateAction<Todo[]>>;
 }
 const TodoList = ({ todos, change }: Props) => {
-
+    console.log('TODO LIST in TodoList component', todos)
     return (
         <>
             <ul className="list-group">

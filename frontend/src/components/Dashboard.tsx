@@ -1,25 +1,54 @@
 import axios from "axios";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { Todo } from "../interfaces/Todo";
 import TodoForm from "./TodoForm";
 import TodoList from "./TodoList";
+import { format } from 'date-fns'
+import styled from 'styled-components';
+import Button from '../components/shared/Button';
+import SmallButton from "./shared/SmallButton";
 
+const DashboardWrapper = styled.div`
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 25px;
+    background-color: yellow;
+    margin-top: 50px;
+    h1 {
+      font-family: 'Sofia', cursive;
+    }
+`
+
+const IntroWrapper = styled.div`
+    display: flex;
+    justify-content: space-between;
+  `
+var v = require('voca');
 export default function Dashboard() {
   const [todos, setTodos] = useState<Array<Todo>>([]);
   const [todoValue, setTodoValue] = useState("");
   const [completedTodos, setCompletedTodos] = useState<Array<Todo>>([]);
-
+  const [name, setName] = useState('')
   const [authenticated, setAuthenticated] = useState(Boolean);
 
-  console.log('authenticated status before useeffect', authenticated)
+  let token = localStorage.getItem('token')
+
+  // date fns
+  let current_date = format(new Date(), 'MMMM do, y')
+  //=> "3 days ago"
+  console.log(current_date)
+  const navigate = useNavigate();
+
+  // console.log(token)
+  // console.log('authenticated status before useeffect', authenticated)
   useEffect(() => {
-    console.log('IN USE EFFECT')
     const isLoggedIn = localStorage.getItem("authenticated")
-    console.log(typeof isLoggedIn)
+    // console.log(typeof isLoggedIn)
     let loggedInStatus = isLoggedIn == "true" ? true : false;
     console.log(loggedInStatus) // this is a boolean and should work!!!
-    
+
     if (loggedInStatus) {
       setAuthenticated(loggedInStatus)
     }
@@ -27,18 +56,31 @@ export default function Dashboard() {
 
   console.log(localStorage)
   console.log("AUTHENTICATED STATUS", authenticated)
-  console.log("ALL TODOS", todos)
+  // console.log("ALL TODOS", todos)
   // can you have 2 separate useEffects?! - FIX later
   useEffect(() => {
     // getting all todos
     axios.get<Todo[]>('http://localhost:8080/tasks', {
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem('token')
+        // Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`
       }
     })
       .then(response => {
         setTodos(response.data)
+      })
+      .catch(err => console.log(err))
+
+    axios.get('http://localhost:8080/users/me', {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      }
+    })
+      .then(response => {
+        console.log(response.data.name)
+        setName(v.upperCase(response.data.name)) //using voca case manipulation
       })
       .catch(err => console.log(err))
   }, [])
@@ -50,6 +92,7 @@ export default function Dashboard() {
 
   // create all completed todos array
   const checkAllCompleted = () => {
+    console.log('in checkAllCompleted:', todos)
     let completedArr: Todo[] = []
     // initializing completedArr array on component render!
     // find all completed todos and add them to completedArr
@@ -76,7 +119,7 @@ export default function Dashboard() {
     axios.post<Todo[]>('http://localhost:8080/tasks', { description: todoValue }, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem('token')
+        Authorization: `Bearer ${token}`
       }
     })
       .then(response => {
@@ -117,7 +160,7 @@ export default function Dashboard() {
       axios.delete(`http://localhost:8080/tasks/${todos[remove[i]]._id}`, {
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem('token')
+          Authorization: `Bearer ${token}`
         }
       }) // should this be todos or updatedTodos
         .then(response => {
@@ -128,18 +171,19 @@ export default function Dashboard() {
   }
 
   const handleLogout = () => {
-    console.log('logoout button pressed')
-    console.log(localStorage.getItem('token'))
-    axios.post(`http://localhost:8080/users/logoutAll`, {
+    // this works when sending an empty object?! WHYYYYY - doesn't need any content sent from postman,,, but maybe because POST?
+    axios.post('http://localhost:8080/users/logout', {}, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem('token')
+        Authorization: `Bearer ${token}`
       }
     })
-    .then((response) => {
-      console.log(response.data)
-      console.log('need to clear localstorage and redirect back to /login')
-    })
+      .then(response => {
+        console.log("logout?", response.data)
+        localStorage.clear()
+        navigate('/login')
+
+      }).catch(error => console.log(error))
   }
 
   // if (authenticated === false) {
@@ -167,8 +211,20 @@ export default function Dashboard() {
   if (localStorage.getItem("authenticated") == "true") {
     return (
       <>
+      <DashboardWrapper>
+
+        <IntroWrapper>
+        <p>Welcome {name}</p>
+        <div>
+        <p>{current_date}</p>
+        <SmallButton onClick={handleLogout} title="Logout"/>
+        </div>
+
+        </IntroWrapper>
+
         <h1>Todo List</h1>
-        <button onClick={handleLogout}>Logout</button>
+        
+        {/* <button onClick={handleLogout}>Logout</button> */}
         <TodoForm
           onSubmit={handleSubmit}
           onInputChange={handleChange}
@@ -178,13 +234,12 @@ export default function Dashboard() {
           todos={todos}
           change={setTodos}
         />
-        <button onClick={handleClearing}>clear all completed</button>
+        <SmallButton onClick={handleClearing} title="clear all completed"/>
+        {/* <button onClick={handleClearing}></button> */}
+        </DashboardWrapper>
       </>
-  )
-} else {
-  return <Navigate replace to="/login" />
+    )
+  } else {
+    return <Navigate replace to="/login" />
+  }
 }
-
-
-}
-

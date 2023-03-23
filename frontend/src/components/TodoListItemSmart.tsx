@@ -24,6 +24,8 @@ interface Props extends HTMLProps<HTMLFormElement> {
 const TodoListItemSmart = ({ todo, todos, change }: Props) => {
     const [newTodos, setNewTodos] = useState(todos);
 
+    console.log("TodoListItemSmart TODOS", todos)
+
     const log = () => {
         console.log('todos from child being sent to parent?!')
     }
@@ -33,7 +35,7 @@ const TodoListItemSmart = ({ todo, todos, change }: Props) => {
             log()
         }
         // anonymous function to update state in parent component - es6 equivalent?
-        (function () {
+        (function () { // change to an arrow function***
             change(newTodos) //sending newTodos to parent component
             // changeStatus(newTodoStatus)
         })()
@@ -44,7 +46,7 @@ const TodoListItemSmart = ({ todo, todos, change }: Props) => {
         let id = todo._id;
         todo.completed = !todo.completed;
 
-        console.log("status has been CHANGED to:", todo.completed)
+        // update todo completed status
         axios.patch(`http://localhost:8080/tasks/${id}`, { completed: todo.completed }, {
             headers: {
                 "Content-Type": "application/json",
@@ -59,7 +61,8 @@ const TodoListItemSmart = ({ todo, todos, change }: Props) => {
                     return todo._id === id;
                 })
                
-                let updatedTodos = [...newTodos]
+                // let updatedTodos = [...newTodos] // issue is HERE
+                let updatedTodos = [...todos] // issue is HERE
                 updatedTodos[index].completed = todo.completed;
                 setNewTodos(updatedTodos)
             }).catch(err => console.log(err))
@@ -76,13 +79,14 @@ const TodoListItemSmart = ({ todo, todos, change }: Props) => {
         // update todo list
         todos = [...todos.slice(0, index), ...todos.slice(index + 1)];
 
+        // deleting specified todo task
         axios.delete(`http://localhost:8080/tasks/${todo._id}`, {
             headers: {
                 "Content-Type": "application/json",
                 Authorization: "Bearer " + localStorage.getItem('token')
               }
         })
-            .then(response => { // do something else here? add a catch statement
+            .then(response => { // do something else here? add a catch statement?!
                 setNewTodos(todos)
             })
     }

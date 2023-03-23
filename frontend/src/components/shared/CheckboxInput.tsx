@@ -73,7 +73,7 @@ const CheckboxInput = ({ completed, updateStatus, deleteButtonHandler }: Props) 
         <>
             <Label>
                 <input className="checkboxStatus" type="checkbox"
-                    defaultChecked={completed} //change back to checked?! checked={todo.completed}
+                    defaultChecked={completed}
                     onChange={updateStatus}
                 />
                 <span className="checkmark"></span>

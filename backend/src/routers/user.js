@@ -34,6 +34,8 @@ router.post('/users/login', async (req, res) => {
 // this endpoint will requrie authentication - need token to logout
 router.post('/users/logout', auth, async (req, res) => {
     // need access to token that was used to login - only want to logout on certain device
+    console.log("ALL TOKENS", req.user.tokens) // uncomment this after test
+
     try  {
         req.user.tokens = req.user.tokens.filter((token) => {
             return token.token !== req.token // if not eqyal, return true otherwise remove from obj

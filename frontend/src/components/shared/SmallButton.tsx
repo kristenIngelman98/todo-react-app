@@ -1,26 +1,26 @@
 import styled from 'styled-components';
 
 const ButtonWrapper = styled.div`
-    text-align: center;
+    // text-align: center;
 `
 const ButtonBig = styled.button`
-    width: 100%;
+    // width: 100%;
 `
 interface Props {
     title: string;
     onClick?: () => void
 }
 
-const Button = ({ title, onClick }: Props) => {
+const SmallButton = ({ title, onClick }: Props) => {
 
     return (
         <>
         <ButtonWrapper>
-            <ButtonBig onClick={onClick} className="btn btn-dark">{title}</ButtonBig>
+            <ButtonBig onClick={onClick} className="btn btn-outline-danger">{title}</ButtonBig>
         </ButtonWrapper>
             
         </>
     )
 }
 
-export default Button;
+export default SmallButton;

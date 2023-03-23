@@ -12,6 +12,10 @@ const TrashCanWrapper = styled.div`
   }
 `;
 
+const ListItemLi = styled.li`
+  font-family: 'Neucha', cursive;
+`
+
 interface Props {
     description: string;
     deleteButtonHandler: () => void;
@@ -20,7 +24,7 @@ const ListItem = ( {description, deleteButtonHandler }: Props ) => {
 
     return (
         <>
-             <li className="list-group-item">{description}</li>
+             <ListItemLi className="list-group-item">{description}</ListItemLi>
              <TrashCanWrapper>
                     <FontAwesomeIcon icon={faTrashCan} onClick={() => deleteButtonHandler()} />
             </TrashCanWrapper>

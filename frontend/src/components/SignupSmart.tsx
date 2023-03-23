@@ -20,15 +20,18 @@ const SignupSmart = () => {
         if (event.target.type === "text") {
             name = event.target.value;
             setUserName(name)
+            // setUserName(event.target.value)
         }
 
         if (event.target.type === "email") {
             email = event.target.value;
             setNewUserEmail(email)
+            // setNewUserPassword(event.target.value)
         }
         if (event.target.type === "password") {
             password = event.target.value;
             setNewUserPassword(password)
+            // setNewUserPassword(event.target.value)
         }
     }
 
