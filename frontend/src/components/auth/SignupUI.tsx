@@ -1,8 +1,9 @@
 import { ChangeEvent, HTMLProps } from "react";
-import Question from "./shared/Question";
-import Button from "./shared/Button";
-import Input from "./shared/Input";
+import Question from "../shared/Question";
+import Button from "../shared/BigButton";
+import Input from "../shared/Input";
 import styled from 'styled-components';
+import Title from "../shared/PageTitle";
 
 const FormWrapper = styled.div`
     max-width: 600px;
@@ -15,8 +16,10 @@ interface Props extends HTMLProps<HTMLFormElement> {
     onSignupChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
-const SignUp = ({ onSignupChange, ...props } : Props) => {
+const SignupUI = ({ onSignupChange, ...props } : Props) => {
     return (
+        <>
+       <Title title="Sign Up" />
         <FormWrapper>
             <form {...props}>
                 <Input onInputChange={onSignupChange} placeholder="Name" type="text" />
@@ -26,8 +29,8 @@ const SignUp = ({ onSignupChange, ...props } : Props) => {
                 <Question question="Already have an account?" action="Log In" link="/login" />
             </form>
             </FormWrapper>
-
+        </>
     )
 }
 
-export default SignUp;
+export default SignupUI;

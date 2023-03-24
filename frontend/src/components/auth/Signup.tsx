@@ -1,9 +1,9 @@
 import { ChangeEvent, FormEvent, useState } from "react";
 import axios from 'axios';
-import SignUp from "./SignUp";
 import { useNavigate } from 'react-router-dom';
+import SignupUI from './SignupUI';
 
-const SignupSmart = () => {
+const Signup = () => {
     const [userName, setUserName] = useState('')
     const [newUserEmail, setNewUserEmail] = useState('')
     const [newUserPassword, setNewUserPassword] = useState('')
@@ -17,21 +17,18 @@ const SignupSmart = () => {
         let email: string = '';
         let password: string = '';
 
+        // change to switch statment?!
         if (event.target.type === "text") {
             name = event.target.value;
             setUserName(name)
-            // setUserName(event.target.value)
         }
-
         if (event.target.type === "email") {
             email = event.target.value;
             setNewUserEmail(email)
-            // setNewUserPassword(event.target.value)
         }
         if (event.target.type === "password") {
             password = event.target.value;
             setNewUserPassword(password)
-            // setNewUserPassword(event.target.value)
         }
     }
 
@@ -40,23 +37,24 @@ const SignupSmart = () => {
 
         axios.post('http://localhost:8080/users', { name: userName, email: newUserEmail, password: newUserPassword })
             .then(response => {
-                console.log(response.data)
-                console.log(response.status)
-
-                // change how this is handled, 201 may be different?!
                 if (response.status === 201) {
-                    localStorage.setItem('token', response.data.token)
                     setIsLoggedIn(true)
+                    localStorage.setItem('token', response.data.token)
+                    localStorage.setItem("authenticated", "true")
                     navigate('/dashboard'); // redirecting to dashboard
                 } else {
-                    console.log(response.status)
-                    setIsLoggedIn(false)
+                    return // is this right? do I even need an else?
                 }
-            }).catch(error => console.log(error.name))
+            }).catch((error => {
+                console.log(error)
+                localStorage.setItem('authenticated', 'false')
+                setIsLoggedIn(false)
+                // setError('Unable to login. Please try again!')
+              }))
     }
 
     return (
-        <SignUp
+        <SignupUI
             onSignupChange={handleSignup}
             onSubmit={handleSignupSubmit}
         />
@@ -64,4 +62,4 @@ const SignupSmart = () => {
 }
 
 
-export default SignupSmart;
+export default Signup;

@@ -62,25 +62,21 @@ const Label = styled.label`
 `;
 
 interface Props {
-    completed: boolean;
-    updateStatus: () => void;
-    deleteButtonHandler: () => void;
+  completed: boolean;
+  updateStatus: () => void;
+  deleteButtonHandler: () => void;
 }
 
 const CheckboxInput = ({ completed, updateStatus, deleteButtonHandler }: Props) => {
-
-    return (
-        <>
-            <Label>
-                <input className="checkboxStatus" type="checkbox"
-                    defaultChecked={completed}
-                    onChange={updateStatus}
-                />
-                <span className="checkmark"></span>
-            </Label>
-
-        </>
-    )
+  return (
+    <Label>
+      <input className="checkboxStatus" type="checkbox"
+        defaultChecked={completed}
+        onChange={updateStatus}
+      />
+      <span className="checkmark"></span>
+    </Label>
+  )
 }
 
 export default CheckboxInput;

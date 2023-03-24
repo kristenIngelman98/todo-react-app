@@ -1,27 +1,26 @@
 import { ChangeEvent, HTMLProps } from "react";
 import styled from 'styled-components';
 
+const FormWrapper = styled.div`
+    margin-bottom: 15px;
+`;
+
 const FormElementWrapper = styled.div`
     display:flex;
 
     button {
         margin-left: 5px;
     }
+`;
 
-`
-
-const FormWrapper = styled.div`
-    margin-bottom: 15px;
-`
 interface Props extends HTMLProps<HTMLFormElement> {
     onInputChange: (event: ChangeEvent<HTMLInputElement>) => void; // telling ts we are expecting a method that accepts an event as a parameter and doersn't return anything: voic!
     inputValue: string;
 }
+
 const TodoForm = ({ onInputChange, inputValue, ...props }: Props) => {
     return (
         <FormWrapper>
-
-       
         <form {...props}>
             <FormElementWrapper>
             <input

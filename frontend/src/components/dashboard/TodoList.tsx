@@ -1,18 +1,20 @@
 import { Dispatch, SetStateAction } from "react";
-import { Todo } from "../interfaces/Todo";
-import TodoListItemSmart from "./TodoListItemSmart";
+import { Todo } from "../../interfaces/Todo";
+import ListItem from "./ListItem";
+import styled from 'styled-components';
 
+const List = styled.ul`
+    list-style: none; 
+`;
 interface Props {
     todos: Todo[]; //an array of that type. Same as Array<Todo>
     change: Dispatch<SetStateAction<Todo[]>>;
 }
 const TodoList = ({ todos, change }: Props) => {
-    console.log('TODO LIST in TodoList component', todos)
     return (
-        <>
-            <ul className="list-group">
+            <List className="list-group">
                 {todos.map((todo) => (
-                    <TodoListItemSmart key={todo._id}
+                    <ListItem key={todo._id}
                         todo={{
                             _id: todo._id,
                             description: todo.description,
@@ -20,8 +22,7 @@ const TodoList = ({ todos, change }: Props) => {
                         }} todos={todos} change={change}
                     />
                 ))}
-            </ul>
-        </>
+            </List>
     )
 }
 

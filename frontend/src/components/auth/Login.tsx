@@ -1,44 +1,39 @@
 import { ChangeEvent, FormEvent, useState } from "react";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import Login from './Login';
+import LoginUI from './LoginUI';
 import { Alert } from 'reactstrap';
 
-const LoginSmart = () => {
+const Login = () => {
     const [userEmail, setUserEmail] = useState('');
     const [userPassword, setUserPassword] = useState('')
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [error, setError] = useState('')
+
     const navigate = useNavigate();
 
     const handleLoginButtonPress = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-    
+        
+        // login w/ email and password
         axios.post('http://localhost:8080/users/login', { email: userEmail, password: userPassword })
           .then(response => {
             if (response.status === 200) {
-              console.log(response.status)
               setIsLoggedIn(true)
               localStorage.setItem('token', response.data.token)
               localStorage.setItem("authenticated", "true")
-              console.log(localStorage)
               navigate('/dashboard');
-            } else { // this never gets reaches here
-              console.log(response.status)
+            } else { // this never gets reaches here?!
               localStorage.setItem('authenticated', 'false')
-              console.log(localStorage)
               setIsLoggedIn(false)
+              return // remove above lines?!
             }
           }).catch((error => {
-            console.log(error)
             localStorage.setItem('authenticated', 'false')
-            console.log(localStorage)
             setIsLoggedIn(false)
-            setError('unable to login. try again.')
+            setError('Unable to login. Please try again!')
           }))
-          
-    
-        setUserEmail("")
+        setUserEmail("") // reset input values  
         setUserPassword("")
       }
     
@@ -58,17 +53,16 @@ const LoginSmart = () => {
           setUserPassword(password)
         }
       }
+
     return (
         <>
-            <Login
+            <LoginUI
                 onInputChange={handleLogin}
                 onSubmit={handleLoginButtonPress}
             />
             {error ? <Alert color="danger">{error}</Alert> : ''}
         </>
-
     )
-
 }
 
-export default LoginSmart;
+export default Login;

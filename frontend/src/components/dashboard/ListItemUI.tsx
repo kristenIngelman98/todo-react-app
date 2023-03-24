@@ -12,8 +12,22 @@ const TrashCanWrapper = styled.div`
   }
 `;
 
-const ListItemLi = styled.li`
+const ListItemWrapper = styled.div`
+  display: flex;
+  justify-conent: space-between
+
+  li {
+    font-family: 'Neucha', cursive;
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+`;
+
+const Item = styled.li`
   font-family: 'Neucha', cursive;
+  margin-top: auto;
+  margin-bottom: auto;
+  font-size: 1.2em;
 `
 
 interface Props {
@@ -23,12 +37,12 @@ interface Props {
 const ListItem = ( {description, deleteButtonHandler }: Props ) => {
 
     return (
-        <>
-             <ListItemLi className="list-group-item">{description}</ListItemLi>
+        <ListItemWrapper>
+             <Item>{description}</Item>
              <TrashCanWrapper>
                     <FontAwesomeIcon icon={faTrashCan} onClick={() => deleteButtonHandler()} />
             </TrashCanWrapper>
-        </>
+        </ListItemWrapper>
     )
 }
 

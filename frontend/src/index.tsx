@@ -1,11 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-// import App from './components/removed/App';
 import reportWebVitals from './reportWebVitals';
-import { BrowserRouter, Route, Routes, redirect, Navigate } from "react-router-dom";
-import Dashboard from './components/Dashboard';
-import LoginSmart from './components/LoginSmart';
-import SignupSmart from './components/SignupSmart';
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import Dashboard from './components/dashboard/Dashboard';
+import Login from './components/auth/Login';
+import Signup from './components/auth/Signup';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -16,8 +15,8 @@ root.render(
       <Routes>
         <Route index path="/" element={<Navigate to="/login" replace={true} />} />
         <Route path="dashboard" element={<Dashboard />} />
-        <Route path="login" element={<LoginSmart />} />
-        <Route path="signup" element={<SignupSmart /> } />
+        <Route path="login" element={<Login />} />
+        <Route path="signup" element={<Signup /> } />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

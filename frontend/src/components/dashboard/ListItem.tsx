@@ -1,9 +1,9 @@
 import { Dispatch, HTMLProps, SetStateAction, useEffect, useState } from "react";
-import { Todo } from "../interfaces/Todo";
+import { Todo } from "../../interfaces/Todo";
 import styled from 'styled-components';
-import ListItem from "./shared/ListItem";
+import ListItemUI from "./ListItemUI";
 import axios from "axios";
-import CheckboxInput from "./shared/CheckboxInput";
+import CheckboxInput from "../shared/CheckboxInput";
 
 const ToDoWrapper = styled.div`
   background-color: white;
@@ -24,16 +24,16 @@ interface Props extends HTMLProps<HTMLFormElement> {
 const TodoListItemSmart = ({ todo, todos, change }: Props) => {
     const [newTodos, setNewTodos] = useState(todos);
 
-    console.log("TodoListItemSmart TODOS", todos)
+    let token = localStorage.getItem('token')
 
-    const log = () => {
-        console.log('todos from child being sent to parent?!')
-    }
+    const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        }
+      }
 
     useEffect(() => {
-        if (newTodos) {
-            log()
-        }
         // anonymous function to update state in parent component - es6 equivalent?
         (function () { // change to an arrow function***
             change(newTodos) //sending newTodos to parent component
@@ -47,12 +47,7 @@ const TodoListItemSmart = ({ todo, todos, change }: Props) => {
         todo.completed = !todo.completed;
 
         // update todo completed status
-        axios.patch(`http://localhost:8080/tasks/${id}`, { completed: todo.completed }, {
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + localStorage.getItem('token')
-              }
-        })
+        axios.patch(`http://localhost:8080/tasks/${id}`, { completed: todo.completed }, config)
             .then(response => {
                 let todo = response.data
 
@@ -80,12 +75,7 @@ const TodoListItemSmart = ({ todo, todos, change }: Props) => {
         todos = [...todos.slice(0, index), ...todos.slice(index + 1)];
 
         // deleting specified todo task
-        axios.delete(`http://localhost:8080/tasks/${todo._id}`, {
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + localStorage.getItem('token')
-              }
-        })
+        axios.delete(`http://localhost:8080/tasks/${todo._id}`, config)
             .then(response => { // do something else here? add a catch statement?!
                 setNewTodos(todos)
             })
@@ -95,7 +85,7 @@ const TodoListItemSmart = ({ todo, todos, change }: Props) => {
         <>
             <ToDoWrapper>
                 <CheckboxInput completed={todo.completed} updateStatus={updateStatus} deleteButtonHandler={deleteButtonHandler}/>
-                <ListItem description={todo.description} deleteButtonHandler={deleteButtonHandler}/>
+                <ListItemUI description={todo.description} deleteButtonHandler={deleteButtonHandler}/>
             </ToDoWrapper>
         </>
     )
