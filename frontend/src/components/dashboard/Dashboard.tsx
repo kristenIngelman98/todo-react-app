@@ -35,12 +35,12 @@ export default function Dashboard() {
   const [todoValue, setTodoValue] = useState("");
   const [completedTodos, setCompletedTodos] = useState<Array<Todo>>([]);
   const [name, setName] = useState('')
-  const [authenticated, setAuthenticated] = useState(Boolean);
+  // const [authenticated, setAuthenticated] = useState(Boolean);
 
-  // what is this?! ADD COMMENT
   const navigate = useNavigate();
 
   let token = localStorage.getItem('token')
+  let auth = localStorage.getItem('authenticated')
 
   const config = {
     headers: {
@@ -53,18 +53,16 @@ export default function Dashboard() {
   // date formatting w/ date-fns
   let current_date = format(new Date(), 'MMMM do, y')
 
-  // THIS CURRENTLY IS NOT WORKING! - CHECK/FIX
-  useEffect(() => {
-    const isLoggedIn = localStorage.getItem("authenticated")
-    let loggedInStatus = isLoggedIn === "true" ? true : false;
-    console.log(loggedInStatus) // this is a boolean and should work!!!
+  // useEffect(() => {
+  //   const isLoggedIn = localStorage.getItem("authenticated")
+  //   let loggedInStatus = isLoggedIn === "true" ? true : false;
+  //   console.log(loggedInStatus)
 
-    if (loggedInStatus) {
-      setAuthenticated(loggedInStatus)
-    }
-  }, [])
+  //   if (loggedInStatus) {
+  //     // setAuthenticated(loggedInStatus)
+  //   }
+  // }, [])
 
-  // can you have 2 separate useEffects?! - FIX later
   useEffect(() => {
     // getting all todos for specific user
     axios.get<Todo[]>('http://localhost:8080/tasks', config)
@@ -100,6 +98,31 @@ export default function Dashboard() {
     setCompletedTodos(completedArr)
   }
 
+  // remove all completed todos
+  const handleClearing = async () => {
+    let updatedTodos = [...todos]
+    let remove: any = []; // array of indexes to remove
+
+    completedTodos.map((todo) => {
+      let id = todo._id;
+      // find index of todo to remove based on id
+      let index = todos.findIndex(function (todo) {
+        return todo._id === id;
+      })
+      remove.push(index)
+    })
+
+    // update todo list
+    for (var i = remove.length - 1; i >= 0; i--) {
+      updatedTodos.splice(remove[i], 1) // explain this!! review splice
+      
+      axios.delete(`http://localhost:8080/tasks/${todos[remove[i]]._id}`, config)
+      .then(response => {
+        setTodos(updatedTodos)
+      }).catch(err => console.log(err))
+    }
+  }
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     addTodo();
@@ -119,39 +142,15 @@ export default function Dashboard() {
     setTodoValue(event.currentTarget.value)
   }
 
-  const handleClearing = async () => {
-    let updatedTodos = [...todos]
-    let remove: any = []; //change this type later
-
-    completedTodos.map((todo) => {
-      let id = todo._id;
-      // find index of todo to remove based on id
-      let index = todos.findIndex(function (todo) {
-        return todo._id === id;
-      })
-      remove.push(index)
-    })
-
-    // update todo list
-    for (var i = remove.length - 1; i >= 0; i--) {
-      updatedTodos.splice(remove[i], 1)
-      axios.delete(`http://localhost:8080/tasks/${todos[remove[i]]._id}`, config)
-      .then(response => { // do I need response to be here?!
-        setTodos(updatedTodos)
-      }).catch(err => console.log(err))
-    }
-  }
-
   const handleLogout = () => {
-    // this works when sending an empty object?! WHYYYYY - doesn't need any content sent from postman,,, but maybe because POST?
     axios.post('http://localhost:8080/users/logout', {}, config)
     .then(response => {
-      localStorage.clear() // clear local storage to clear token and auth status
-      navigate('/login') // redirect to /login
+      localStorage.clear() // clear local storage
+      navigate('/login')
     }).catch(err => console.log(err))
   }
 
-  if (localStorage.getItem("authenticated") == "true") {
+  if (auth == "true") {
     return (
       <DashboardWrapper>
         <IntroWrapper>

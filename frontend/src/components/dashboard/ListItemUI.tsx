@@ -34,7 +34,8 @@ interface Props {
     description: string;
     deleteButtonHandler: () => void;
 }
-const ListItem = ( {description, deleteButtonHandler }: Props ) => {
+
+const ListItem = ( { description, deleteButtonHandler }: Props ) => {
 
     return (
         <ListItemWrapper>

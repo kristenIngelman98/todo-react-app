@@ -4,41 +4,40 @@ import { useNavigate } from 'react-router-dom';
 import SignupUI from './SignupUI';
 
 const Signup = () => {
-    const [userName, setUserName] = useState('')
-    const [newUserEmail, setNewUserEmail] = useState('')
-    const [newUserPassword, setNewUserPassword] = useState('')
+    const [user, setUser] = useState({ name: '', email: '', password: '' });
+    // const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const navigate = useNavigate();
 
     const handleSignup = (event: ChangeEvent<HTMLInputElement>) => {
-
-        let name: string = '';
-        let email: string = '';
-        let password: string = '';
-
-        // change to switch statment?!
         if (event.target.type === "text") {
-            name = event.target.value;
-            setUserName(name)
+            setUser({
+                ...user,
+                name: event.target.value,
+            })
         }
         if (event.target.type === "email") {
-            email = event.target.value;
-            setNewUserEmail(email)
+            setUser({
+                ...user,
+                email: event.target.value,
+            })
         }
         if (event.target.type === "password") {
-            password = event.target.value;
-            setNewUserPassword(password)
+            setUser({
+                ...user,
+                password: event.target.value
+            })
         }
     }
 
     const handleSignupSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        axios.post('http://localhost:8080/users', { name: userName, email: newUserEmail, password: newUserPassword })
+        // create new user
+        axios.post('http://localhost:8080/users', user)
             .then(response => {
                 if (response.status === 201) {
-                    setIsLoggedIn(true)
+                    // setIsLoggedIn(true)
                     localStorage.setItem('token', response.data.token)
                     localStorage.setItem("authenticated", "true")
                     navigate('/dashboard'); // redirecting to dashboard
@@ -46,11 +45,10 @@ const Signup = () => {
                     return // is this right? do I even need an else?
                 }
             }).catch((error => {
-                console.log(error)
                 localStorage.setItem('authenticated', 'false')
-                setIsLoggedIn(false)
+                // setIsLoggedIn(false)
                 // setError('Unable to login. Please try again!')
-              }))
+            }))
     }
 
     return (

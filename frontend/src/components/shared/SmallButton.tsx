@@ -1,6 +1,6 @@
 interface Props {
     title: string;
-    onClick?: () => void
+    onClick?: () => void //optional
 }
 
 const SmallButton = ({ title, onClick }: Props) => {

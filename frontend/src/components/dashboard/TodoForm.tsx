@@ -14,7 +14,7 @@ const FormElementWrapper = styled.div`
 `;
 
 interface Props extends HTMLProps<HTMLFormElement> {
-    onInputChange: (event: ChangeEvent<HTMLInputElement>) => void; // telling ts we are expecting a method that accepts an event as a parameter and doersn't return anything: voic!
+    onInputChange: (event: ChangeEvent<HTMLInputElement>) => void; // telling ts we are expecting a method that accepts an event as a parameter and doersn't return anything: void!
     inputValue: string;
 }
 

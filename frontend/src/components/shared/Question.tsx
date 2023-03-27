@@ -5,7 +5,8 @@ import styled from 'styled-components';
 const Prompt = styled.p`
     text-align: center;
     margin-top: 5px;
-`
+`;
+
 interface Props extends HTMLProps<HTMLFormElement> {
     question: string;
     link: string;

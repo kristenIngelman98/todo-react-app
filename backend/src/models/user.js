@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique: true, //make sure multiple people don't sign up with same email. guarantee uniqueness
+        unique: true, // ensure email is unique (no duplicate email sign ups)
         trim: true,
         lowercase: true,
         validate(value) {
@@ -33,7 +33,6 @@ const userSchema = new mongoose.Schema({
                 throw new Error('Password cannot include "password"')
             }
         }
-
     },
     age: {
         type: Number,
@@ -44,6 +43,7 @@ const userSchema = new mongoose.Schema({
             }
         }
     },
+    // array of objects -> each object is a token -> a new token is created on each login/signup submission
     tokens: [{
         token: {
             type: String,
@@ -52,45 +52,39 @@ const userSchema = new mongoose.Schema({
     }]
 })
 
-// setup a VIRTUAL PROPERTY
-// not actual data stored in the database, its a relationship between 2 entitites E.g. between User and tasks
-
+// VIRTUAL PROPERTY -> not actual data stored in the database, but a relationship between 2 entitites E.g. between a user & tasks
 userSchema.virtual('tasks', {
     ref: 'Task',
-    localField: '_id', // associated with the users ID
+    localField: '_id', // associated with the users id
     foreignField: 'owner' // name of the field on the task -> set that up to be the owner - also an ID
 })
 
-// we want back an obj with JUST user data
+// returning an obj with JUST user data (without password & all tokens)
 userSchema.methods.toJSON = function () {
     const user = this
-    const userObject = user.toObject()
-
-    // removing password and token from response to the client**
-    delete userObject.password
-    delete userObject.tokens
+    const userObject = user.toObject() // converts mongoose obj into reg js object
+    delete userObject.password // removing password from response to client
+    delete userObject.tokens // removing tokens from response to client
     return userObject
 }
-// generating auth token for user --> for signup and login
-userSchema.methods.generateAuthToken = async function () {
+
+// generating auth token for user --> for signup & login
+userSchema.methods.generateAuthToken = async function () { // new method
     const user = this
 
-    // id and secret - use .sign() to provide payload and secret
-    // uniquely identify the user with their unique id
-    const token = jwt.sign({ _id: user._id.toString()}, 'thisismynewcourse')
+    // id and secret - use .sign() to provide payload and secret -> uniquely identify the user with their unique id
+    const token = jwt.sign({ _id: user._id.toString()}, 'mysecret') // jwt.sign() creates a token --> takes 2 args, an object and a string
+    // object includes the data that will be embedded in our token, for us all we need to store in here is a unique identifier (so _id!)
+    // second arg is the secret, make sure it wasn't tampered or changed in any way
 
-    user.tokens = user.tokens.concat({ token })
-    // save token to the database
-    user.save()
-    
+    user.tokens = user.tokens.concat({ token }) // add new token to the tokens array
+    user.save() // save token to the database
     return token
 }
 
-// can access on the model
-// attempt to find the user by those peices on info
+// attempt to find the user by specific pieces of info (email/password)
 userSchema.statics.findByCredentials = async (email, password) => {
-    // first find by email
-    const user = await User.findOne({ email })
+    const user = await User.findOne({ email }) // first find by email
 
     if (!user) {
         throw new Error('Unable to login')
@@ -103,28 +97,23 @@ userSchema.statics.findByCredentials = async (email, password) => {
     if (!isMatch) {
         throw new Error('Unable to login')
     }
-
     return user
-
 }
 
-// do this before we save
-// "next", must call next() when we are done
-// if we don't call next() the function will hang and the use rwill not be saved
+// do this before we save -> must call next() when we are done or the funct will hang and the user will NOT be saved - middleware (pre-save hook)
 userSchema.pre('save', async function (next) {
     const user = this
     
     if (user.isModified('password')) {
         user.password = await bcrypt.hash(user.password, 8)
     }
-
     next()
-
 })
-// delete user tasks when user is removed
+
+// delete user tasks when user is removed - middleware 
 userSchema.pre('remove', async function (next) {
     const user = this
-    await Task.deleteMany({ owner: user._id }) // delete all tasks where the owner ID is set to something specific
+    await Task.deleteMany({ owner: user._id }) // delete all tasks where the owner id is set to something specific
     next()
 })
 

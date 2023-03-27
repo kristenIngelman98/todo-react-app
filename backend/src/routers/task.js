@@ -5,11 +5,9 @@ const auth = require('../middleware/auth')
 
 // create task
 router.post('/tasks', auth, async (req, res) => {
-    // const task = new Task(req.body)
-
     const task = new Task({
         ...req.body, //copy all of the properties from body into this object
-        owner: req.user._id // get the owner from the person we just
+        owner: req.user._id // get the owner from the person we just - newly added property to connect to User
     })
 
     try {
@@ -34,23 +32,21 @@ router.delete('/tasks/:id', auth, async (req, res) => {
     }
 })
 
-// read all tasks
+// read all tasks for authenticated user
 router.get('/tasks', auth, async (req, res) => {
     try {
-        // mongoose gets all tasks from the db
-        const tasks = await Task.find({ owner: req.user._id}) // only find the tasks for authenticated user
+        const tasks = await Task.find({ owner: req.user._id})
         res.send(tasks)
     } catch (e) {
         res.status(500).send()
     }
 })
 
-// read task
+// read single task
 router.get('/tasks/:id', auth, async (req, res) => {
     const _id = req.params.id;
 
     try {
-        // const task = await Task.findById(_id)
         const task = await Task.findOne({ _id, owner: req.user._id }) // find single task
             if (!task) {
                 return res.status(404).send()
@@ -60,7 +56,6 @@ router.get('/tasks/:id', auth, async (req, res) => {
         res.status(500).send()
     }
 })
-
 
 // update task
 router.patch('/tasks/:id', auth, async (req, res) => {
@@ -73,10 +68,10 @@ router.patch('/tasks/:id', auth, async (req, res) => {
     if (!isValidOperation) {
         return res.status(400).send({ error: 'Invalid updates!' })
     }
-    try {
-        // const task = await Task.findById(req.params.id)
-        const task = await Task.findOne({ _id: req.params.id, owner: req.user._id })
 
+    try {
+        const task = await Task.findOne({ _id: req.params.id, owner: req.user._id })
+        
         if (!task) {
             return res.status(404).send()
         }
@@ -84,7 +79,6 @@ router.patch('/tasks/:id', auth, async (req, res) => {
         updates.forEach((update) => task[update] = req.body[update])
         await task.save()
         res.send(task)
-
     } catch (e) {
         res.status(400).send(e)
     }

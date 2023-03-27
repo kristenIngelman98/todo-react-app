@@ -21,7 +21,7 @@ interface Props extends HTMLProps<HTMLFormElement> {
     change: Dispatch<SetStateAction<Todo[]>>;
 }
 
-const TodoListItemSmart = ({ todo, todos, change }: Props) => {
+const ListItem = ({ todo, todos, change }: Props) => {
     const [newTodos, setNewTodos] = useState(todos);
 
     let token = localStorage.getItem('token')
@@ -34,15 +34,17 @@ const TodoListItemSmart = ({ todo, todos, change }: Props) => {
       }
 
     useEffect(() => {
-        // anonymous function to update state in parent component - es6 equivalent?
-        (function () { // change to an arrow function***
-            change(newTodos) //sending newTodos to parent component
-            // changeStatus(newTodoStatus)
-        })()
+        // anonymous function to update state in parent component
+        // (function () { 
+        //     change(newTodos) // sending newTodos to parent component
+        //     // changeStatus(newTodoStatus)
+        // })()
+
+        change(newTodos)
     }, [newTodos])
 
 
-    const updateStatus = () => { // change this type!
+    const updateStatus = () => {
         let id = todo._id;
         todo.completed = !todo.completed;
 
@@ -55,9 +57,7 @@ const TodoListItemSmart = ({ todo, todos, change }: Props) => {
                 let index = todos.findIndex(function (todo) {
                     return todo._id === id;
                 })
-               
-                // let updatedTodos = [...newTodos] // issue is HERE
-                let updatedTodos = [...todos] // issue is HERE
+                let updatedTodos = [...todos]
                 updatedTodos[index].completed = todo.completed;
                 setNewTodos(updatedTodos)
             }).catch(err => console.log(err))
@@ -76,9 +76,9 @@ const TodoListItemSmart = ({ todo, todos, change }: Props) => {
 
         // deleting specified todo task
         axios.delete(`http://localhost:8080/tasks/${todo._id}`, config)
-            .then(response => { // do something else here? add a catch statement?!
+            .then(response => {
                 setNewTodos(todos)
-            })
+            }).catch(err => console.log(err))
     }
 
     return (
@@ -91,4 +91,4 @@ const TodoListItemSmart = ({ todo, todos, change }: Props) => {
     )
 }
 
-export default TodoListItemSmart;
+export default ListItem;

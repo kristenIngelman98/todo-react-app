@@ -3,7 +3,8 @@ import styled from 'styled-components';
 
 const InputWrapper = styled.div` 
     margin-bottom:10px;
-`
+`;
+
 interface Props {
     placeholder: string;
     type: string;
