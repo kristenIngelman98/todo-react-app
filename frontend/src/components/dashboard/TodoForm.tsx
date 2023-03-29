@@ -13,15 +13,16 @@ const FormElementWrapper = styled.div`
     }
 `;
 
-interface Props extends HTMLProps<HTMLFormElement> {
+interface Props {
     onInputChange: (event: ChangeEvent<HTMLInputElement>) => void; // telling ts we are expecting a method that accepts an event as a parameter and doersn't return anything: void!
     inputValue: string;
+    formProps: HTMLProps<HTMLFormElement> // wont put onInputChange or inputValue now because not valid formprops
 }
 
-const TodoForm = ({ onInputChange, inputValue, ...props }: Props) => {
+const TodoForm = ({ onInputChange, inputValue, formProps }: Props) => {
     return (
         <FormWrapper>
-        <form {...props}>
+        <form {...formProps}>
             <FormElementWrapper>
             <input
                 className="form-control"

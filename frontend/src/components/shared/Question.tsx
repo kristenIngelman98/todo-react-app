@@ -7,7 +7,7 @@ const Prompt = styled.p`
     margin-top: 5px;
 `;
 
-interface Props extends HTMLProps<HTMLFormElement> {
+interface Props {
     question: string;
     link: string;
     action: string;

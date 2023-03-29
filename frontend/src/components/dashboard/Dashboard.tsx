@@ -4,7 +4,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { Todo } from "../../interfaces/Todo";
 import TodoForm from "./TodoForm";
 import TodoList from "./TodoList";
-import { format } from 'date-fns'
+import format from 'date-fns/format';
 import styled from 'styled-components';
 import SmallButton from "../shared/SmallButton";
 import Title from '../shared/PageTitle'
@@ -132,7 +132,7 @@ export default function Dashboard() {
   const addTodo = () => {
     axios.post<Todo[]>('http://localhost:8080/tasks', { description: todoValue }, config)
     .then(response => {
-      let updatedArray: any = [...todos, response.data] // change type from any?!
+      let updatedArray: any = [...todos, response.data] // change type from any?! - FIX
       setTodos(updatedArray)
     }).catch(error => console.log(error))
   }
@@ -160,10 +160,10 @@ export default function Dashboard() {
             <SmallButton onClick={handleLogout} title="Logout" />
           </div>
         </IntroWrapper>
-        <Title title="Todo List" />
+        <Title className="page-title" title="Todo List" />
         <TodosWrapper>
           <TodoForm
-            onSubmit={handleSubmit}
+            formProps={{onSubmit: handleSubmit}}
             onInputChange={handleChange}
             inputValue={todoValue}
           />

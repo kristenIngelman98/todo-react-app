@@ -68,6 +68,8 @@ interface Props {
 }
 
 const CheckboxInput = ({ completed, updateStatus, deleteButtonHandler }: Props) => {
+
+  
   return (
     <Label>
       <input className="checkboxStatus" type="checkbox"

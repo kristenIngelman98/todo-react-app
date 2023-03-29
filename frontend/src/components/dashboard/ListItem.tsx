@@ -57,8 +57,8 @@ const ListItem = ({ todo, todos, change }: Props) => {
                 let index = todos.findIndex(function (todo) {
                     return todo._id === id;
                 })
-                let updatedTodos = [...todos]
-                updatedTodos[index].completed = todo.completed;
+                let updatedTodos = [...todos] // shallow clone - turn into deep clone
+                updatedTodos[index].completed = todo.completed; //mutation - fix this - 
                 setNewTodos(updatedTodos)
             }).catch(err => console.log(err))
     }

@@ -1,6 +1,6 @@
 import { ChangeEvent, HTMLProps } from "react";
 import Question from "../shared/Question";
-import Button from "../shared/BigButton";
+import Button from "../shared/Button";
 import Input from "../shared/Input";
 import styled from 'styled-components';
 import Title from "../shared/PageTitle";
@@ -19,13 +19,13 @@ interface Props extends HTMLProps<HTMLFormElement> {
 const SignupUI = ({ onSignupChange, ...props } : Props) => {
     return (
         <>
-       <Title title="Sign Up" />
+       <Title className="page-title" title="Sign Up" />
         <FormWrapper>
             <form {...props}>
-                <Input onInputChange={onSignupChange} placeholder="Name" type="text" />
-                <Input onInputChange={onSignupChange} placeholder="Email" type="email" />
-                <Input onInputChange={onSignupChange} placeholder="Password" type="password" />
-                <Button title={"Signup"} />
+                <Input className="input-field" onInputChange={onSignupChange} placeholder="Name" type="text" />
+                <Input className="input-field" onInputChange={onSignupChange} placeholder="Email" type="email" />
+                <Input className="input-field" onInputChange={onSignupChange} placeholder="Password" type="password" />
+                <Button className="bigbutton" title={"Signup"} />
                 <Question question="Already have an account?" action="Log In" link="/login" />
             </form>
             </FormWrapper>
