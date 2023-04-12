@@ -34,13 +34,8 @@ const ListItem = ({ todo, todos, change }: Props) => {
       }
 
     useEffect(() => {
-        // anonymous function to update state in parent component
-        // (function () { 
-        //     change(newTodos) // sending newTodos to parent component
-        //     // changeStatus(newTodoStatus)
-        // })()
-
         change(newTodos)
+        // console.log('useEffect')
     }, [newTodos])
 
 
@@ -57,13 +52,70 @@ const ListItem = ({ todo, todos, change }: Props) => {
                 let index = todos.findIndex(function (todo) {
                     return todo._id === id;
                 })
-                let updatedTodos = [...todos] // shallow clone - turn into deep clone
-                updatedTodos[index].completed = todo.completed; //mutation - fix this - 
-                setNewTodos(updatedTodos)
+
+                // UPDATED CODE - created a deep clone
+                let deepCloneUpdatedTodos = JSON.parse(JSON.stringify(todos)); // deep clone
+                deepCloneUpdatedTodos[index].completed = todo.completed; // this should be okay?! I'm not mutating the original array
+                setNewTodos(deepCloneUpdatedTodos)
             }).catch(err => console.log(err))
     }
 
-    const deleteButtonHandler = () => {
+    // const updateStatus = async () => {
+    //     let id = todo._id;
+    //     todo.completed = !todo.completed;
+
+    //     // update todo completed status
+    //     // axios.patch(`http://localhost:8080/tasks/${id}`, { completed: todo.completed }, config)
+    //     //     .then(response => {
+    //     //         let todo = response.data
+
+    //     //         // find index of todo to remove based on id
+    //     //         let index = todos.findIndex(function (todo) {
+    //     //             return todo._id === id;
+    //     //         })
+
+    //     //         // UPDATED CODE - created a deep clone
+    //     //         let deepCloneUpdatedTodos = JSON.parse(JSON.stringify(todos)); // deep clone
+    //     //         deepCloneUpdatedTodos[index].completed = todo.completed; // this should be okay?! I'm not mutating the original array
+    //     //         setNewTodos(deepCloneUpdatedTodos)
+    //     //     }).catch(err => console.log(err))
+       
+       
+    //    try {
+    //     const headers = new Headers()
+    //     headers.append('Authorization', `Bearer ${token}`)
+    //     headers.append('Content-Type', 'application/json')
+    //     const response = await fetch(`http://localhost:8080/tasks/${id}`, {
+    //         method: 'PATCH',
+    //         headers: headers,
+    //         body: JSON.stringify({ completed: todo.completed })
+    //     });
+
+    //     if (!response.ok) {
+    //         throw new Error('Network response was not ok')
+    //     }
+
+    //     const responseData = await response.json()
+    //     console.log('Task status updated: ', responseData)
+    
+    //     // ADDED LOGIC
+    //     // let todo = responseData
+
+    //     // // find index of todo to remove based on id
+    //     // let index = todos.findIndex(function (todo) {
+    //     //     return todo._id === id;
+    //     // })
+
+    //     // // UPDATED CODE - created a deep clone
+    //     // let deepCloneUpdatedTodos = JSON.parse(JSON.stringify(todos)); // deep clone
+    //     // deepCloneUpdatedTodos[index].completed = todo.completed; // this should be okay?! I'm not mutating the original array
+    //     // setNewTodos(deepCloneUpdatedTodos)
+    //    } catch (error) {
+    //     console.error('Error updating task status: ', error)
+    //    }
+    // }
+
+    const deleteButtonHandler = async () => {
         let id = todo._id;
 
         // find index of todo to remove based on id
@@ -74,17 +126,29 @@ const ListItem = ({ todo, todos, change }: Props) => {
         // update todo list
         todos = [...todos.slice(0, index), ...todos.slice(index + 1)];
 
-        // deleting specified todo task
-        axios.delete(`http://localhost:8080/tasks/${todo._id}`, config)
-            .then(response => {
-                setNewTodos(todos)
-            }).catch(err => console.log(err))
+        try {
+            const headers = new Headers()
+            headers.append('Authorization', `Bearer ${token}`)
+            headers.append('Content-Type', 'application/json')
+            const response = await fetch(`http://localhost:8080/tasks/${todo._id}`, {
+                method: 'DELETE',
+                headers: headers
+        });
+
+        if(!response.ok) {
+            throw new Error('Network response was not ok')
+        }
+        console.log('Single task successfully deleted')
+        setNewTodos(todos)
+        } catch (error ) {
+            console.error('Error deleting single task: ', error)
+        }
     }
 
     return (
         <>
             <ToDoWrapper>
-                <CheckboxInput completed={todo.completed} updateStatus={updateStatus} deleteButtonHandler={deleteButtonHandler}/>
+                <CheckboxInput className="className" completed={todo.completed} updateStatus={updateStatus} deleteButtonHandler={deleteButtonHandler}/>
                 <ListItemUI description={todo.description} deleteButtonHandler={deleteButtonHandler}/>
             </ToDoWrapper>
         </>

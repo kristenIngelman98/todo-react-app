@@ -1,6 +1,24 @@
 import styled from 'styled-components';
 
-const Label = styled.label`
+interface Props {
+  completed: boolean;
+  updateStatus: () => void;
+  deleteButtonHandler: () => void;
+  className: string;
+}
+
+const CheckboxInput = ({ completed, updateStatus, deleteButtonHandler, className }: Props) => {
+  return (
+    <label className={className}>
+      <input className="checkboxStatus" type="checkbox"
+        defaultChecked={completed}
+        onChange={updateStatus} />
+      <span className="checkmark"></span>
+    </label>
+  )
+}
+
+const CheckBoxLabel = styled(CheckboxInput)`
   display: block;
   position: relative;
   padding-left: 35px;
@@ -61,24 +79,4 @@ const Label = styled.label`
   }
 `;
 
-interface Props {
-  completed: boolean;
-  updateStatus: () => void;
-  deleteButtonHandler: () => void;
-}
-
-const CheckboxInput = ({ completed, updateStatus, deleteButtonHandler }: Props) => {
-
-  
-  return (
-    <Label>
-      <input className="checkboxStatus" type="checkbox"
-        defaultChecked={completed}
-        onChange={updateStatus}
-      />
-      <span className="checkmark"></span>
-    </Label>
-  )
-}
-
-export default CheckboxInput;
+export default CheckBoxLabel;

@@ -14,9 +14,7 @@ interface Props {
 
 }
 const Question = ({ question, link, action }: Props) => {
-    return (
-        <Prompt>{question}<span> <Link to={link}>{action}</Link></span></Prompt>
-    )
+    return <Prompt>{question}<span> <Link to={link}>{action}</Link></span></Prompt>
 }
 
 export default Question;

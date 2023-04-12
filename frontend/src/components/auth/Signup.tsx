@@ -30,26 +30,55 @@ const Signup = () => {
         }
     }
 
-    const handleSignupSubmit = (event: FormEvent<HTMLFormElement>) => {
+    const handleSignupSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        try {
+            const response = await fetch('http://localhost:8080/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(user)
+            });
 
-        // create new user
-        axios.post('http://localhost:8080/users', user)
-            .then(response => {
-                if (response.status === 201) {
-                    // setIsLoggedIn(true)
-                    localStorage.setItem('token', response.data.token)
-                    localStorage.setItem("authenticated", "true")
-                    navigate('/dashboard'); // redirecting to dashboard
-                } else {
-                    return // is this right? do I even need an else?
-                }
-            }).catch((error => {
-                localStorage.setItem('authenticated', 'false')
-                // setIsLoggedIn(false)
-                // setError('Unable to login. Please try again!')
-            }))
+            if (!response.ok) {
+                throw new Error('Network response was not ok')
+            }
+
+            const responseData = await response.json()
+            console.log('Signup was successful: ', responseData)
+            // setIsLoggedIn(true)
+            localStorage.setItem('token', responseData.token)
+            localStorage.setItem("authenticated", "true")
+            navigate('/dashboard'); // redirecting to dashboard
+        } catch (error) {
+            console.error('Error creating post:', error)
+            localStorage.setItem('authenticated', 'false')
+            // setIsLoggedIn(false)
+            // setError('Unable to login. Please try again!')
+        };
+
     }
+    // const handleSignupSubmit = (event: FormEvent<HTMLFormElement>) => {
+    //     event.preventDefault();
+
+    //     // create new user
+    //     axios.post('http://localhost:8080/users', user)
+    //         .then(response => {
+    //             if (response.status === 201) {
+    //                 // setIsLoggedIn(true)
+    //                 localStorage.setItem('token', response.data.token)
+    //                 localStorage.setItem("authenticated", "true")
+    //                 navigate('/dashboard'); // redirecting to dashboard
+    //             } else {
+    //                 return // is this right? do I even need an else?
+    //             }
+    //         }).catch((error => {
+    //             localStorage.setItem('authenticated', 'false')
+    //             // setIsLoggedIn(false)
+    //             // setError('Unable to login. Please try again!')
+    //         }))
+    // }
 
     return (
         <SignupUI

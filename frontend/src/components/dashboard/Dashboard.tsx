@@ -49,7 +49,6 @@ export default function Dashboard() {
     }
   }
 
-
   // date formatting w/ date-fns
   let current_date = format(new Date(), 'MMMM do, y')
 
@@ -65,22 +64,34 @@ export default function Dashboard() {
 
   useEffect(() => {
     // getting all todos for specific user
-    axios.get<Todo[]>('http://localhost:8080/tasks', config)
-      .then(response => {
-        setTodos(response.data)
-      }).catch(err => console.log(err))
+    const fetchData = async () => {
+      try {
+        // getting all todos for specific user
+        const response1 = await fetch('http://localhost:8080/tasks', config)
+        const data1 = await response1.json()
+        setTodos(data1)
 
-    // getting the current logged in user
-    axios.get('http://localhost:8080/users/me', config)
-      .then(response => {
-        setName(v.upperCase(response.data.name)) // using voca case manipulation
-      }).catch(err => console.log(err))
+        // getting the current logged in user
+        const response2 = await fetch('http://localhost:8080/users/me', config)
+        const data2 = await response2.json()
+        setName(v.upperCase(data2.name))
+      } catch (error) {
+        console.error('Error fetchig data: ', error)
+      }
+    }
+    fetchData()
   }, [])
 
   // call checkAllCompleted whenever todos are updated
   useEffect(() => {
     checkAllCompleted()
   }, [todos])
+
+  // call checkAllCompleted whenever todos are updated
+  useEffect(() => {
+    checkAllCompleted()
+  }, [todos])
+
 
   // create all completed todos array
   const checkAllCompleted = () => {
@@ -99,7 +110,7 @@ export default function Dashboard() {
   }
 
   // remove all completed todos
-  const handleClearing = async () => {
+  const handleClearing = async () => { // FETCH
     let updatedTodos = [...todos]
     let remove: any = []; // array of indexes to remove
 
@@ -114,12 +125,27 @@ export default function Dashboard() {
 
     // update todo list
     for (var i = remove.length - 1; i >= 0; i--) {
-      updatedTodos.splice(remove[i], 1) // explain this!! review splice
-      
-      axios.delete(`http://localhost:8080/tasks/${todos[remove[i]]._id}`, config)
-      .then(response => {
-        setTodos(updatedTodos)
-      }).catch(err => console.log(err))
+      updatedTodos.splice(remove[i], 1)
+
+      try {
+        const headers = new Headers()
+        headers.append('Authorization', `Bearer ${token}`)
+        headers.append('Content-Type', 'application/json')
+
+        const response = await fetch(`http://localhost:8080/tasks/${todos[remove[i]]._id}`, {
+          method: 'DELETE',
+          headers: headers
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok')
+      }
+
+      console.log('Tasks successfully deleted')
+      setTodos(updatedTodos)
+      } catch (error) {
+        console.error('Error deleting tasks', error)
+      }
     }
   }
 
@@ -129,18 +155,58 @@ export default function Dashboard() {
     setTodoValue(""); //resetting todo value in input
   };
 
-  const addTodo = () => {
-    axios.post<Todo[]>('http://localhost:8080/tasks', { description: todoValue }, config)
-    .then(response => {
-      let updatedArray: any = [...todos, response.data] // change type from any?! - FIX
+  const addTodo = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/tasks', {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ description: todoValue })
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok')
+      }
+      const responseData = await response.json()
+      console.log('Task added successfully: ', responseData)
+      let updatedArray: any = [...todos, responseData] // change type from any?! - FIX
       setTodos(updatedArray)
-    }).catch(error => console.log(error))
+    } catch (error) {
+      console.log('Error creating task: ', error)
+    }
   }
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     // setting todo value based on typed input
     setTodoValue(event.currentTarget.value)
   }
+
+  // const handleLogout = async () => {
+  //   try {
+  //     const response = await fetch('http://localhost:8080/users/logout', {
+  //       method: 'POST',
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${token}`
+  //       },
+  //       body: JSON.stringify({})
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error('Network response was not ok')
+  //     }
+
+  //     const responseData = await response.json()
+  //     console.log('Logged out successfully: ', responseData)
+  //     localStorage.clear() // clear local storage
+  //     navigate('/login')
+  //   } catch (error) {
+  //     console.error('Error logging out: ', error)
+  //   }
+  // }
+
 
   const handleLogout = () => {
     axios.post('http://localhost:8080/users/logout', {}, config)

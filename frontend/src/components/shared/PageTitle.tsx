@@ -6,9 +6,7 @@ interface Props {
 }
 
 const PageTitle = ({ title, className }: Props) => {
-    return (
-        <h1 className={className}>{title}</h1>
-    )
+    return <h1 className={className}>{title}</h1>
 }
 
 const Title = styled(PageTitle)`

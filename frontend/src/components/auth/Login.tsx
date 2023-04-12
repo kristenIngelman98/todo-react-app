@@ -31,32 +31,59 @@ const Login = () => {
     }
   }
 
-  const handleLoginButtonPress = (event: FormEvent<HTMLFormElement>) => {
+  const handleLoginButtonPress = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    try {
+      const response = await fetch('http://localhost:8080/users/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(user)
+      });
 
-
-    // login
-    axios.post('http://localhost:8080/users/login', user)
-      .then(response => {
-        if (response.status === 200) { // successful
-          // setIsLoggedIn(true)
-          localStorage.setItem('token', response.data.token)
-          localStorage.setItem("authenticated", "true")
-          navigate('/dashboard');
-        } else {
-          return
-        }
-      }).catch((error => {
-        localStorage.setItem('authenticated', 'false')
-        // setIsLoggedIn(false)
-        setError('Unable to login. Please try again!')
-      }))
-    // reset input values  
-    setUser({
-      email: '',
-      password: ''
-    })
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const responseData = await response.json()
+      console.log('login successful', responseData)
+      localStorage.setItem('token', responseData.token)
+      localStorage.setItem("authenticated", "true")
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Error creating post: ', error)
+      localStorage.setItem('authenticated', 'false')
+      // setIsLoggedIn(false)
+      setError('Unable to login. Please try again!')
+    }
   }
+
+  // const handleLoginButtonPress = (event: FormEvent<HTMLFormElement>) => {
+  //   event.preventDefault();
+
+
+  //   // login
+  //   axios.post('http://localhost:8080/users/login', user)
+  //     .then(response => {
+  //       if (response.status === 200) { // successful
+  //         // setIsLoggedIn(true)
+  //         localStorage.setItem('token', response.data.token)
+  //         localStorage.setItem("authenticated", "true")
+  //         navigate('/dashboard');
+  //       } else {
+  //         return
+  //       }
+  //     }).catch((error => {
+  //       localStorage.setItem('authenticated', 'false')
+  //       // setIsLoggedIn(false)
+  //       setError('Unable to login. Please try again!')
+  //     }))
+  //   // reset input values  
+  //   setUser({
+  //     email: '',
+  //     password: ''
+  //   })
+  // }
 
   return (
     <>
