@@ -31,17 +31,19 @@ const TodosWrapper = styled.div`
 var v = require('voca');
 
 export default function Dashboard() {
+  const [todo, setTodo] = useState<Todo>({_id: "", description: "", completed: false }); // set to specific TODO
   const [todos, setTodos] = useState<Array<Todo>>([]);
   const [todoValue, setTodoValue] = useState("");
   const [completedTodos, setCompletedTodos] = useState<Array<Todo>>([]);
   const [name, setName] = useState('')
   // const [authenticated, setAuthenticated] = useState(Boolean);
-
+  // const [variable, setVariable] = useState("initial value");
   const navigate = useNavigate();
 
   let token = localStorage.getItem('token')
   let auth = localStorage.getItem('authenticated')
 
+  // console.log("ALL TODOS", todos)
   const config = {
     headers: {
       "Content-Type": "application/json",
@@ -51,16 +53,6 @@ export default function Dashboard() {
 
   // date formatting w/ date-fns
   let current_date = format(new Date(), 'MMMM do, y')
-
-  // useEffect(() => {
-  //   const isLoggedIn = localStorage.getItem("authenticated")
-  //   let loggedInStatus = isLoggedIn === "true" ? true : false;
-  //   console.log(loggedInStatus)
-
-  //   if (loggedInStatus) {
-  //     // setAuthenticated(loggedInStatus)
-  //   }
-  // }, [])
 
   useEffect(() => {
     // getting all todos for specific user
@@ -86,12 +78,6 @@ export default function Dashboard() {
   useEffect(() => {
     checkAllCompleted()
   }, [todos])
-
-  // call checkAllCompleted whenever todos are updated
-  useEffect(() => {
-    checkAllCompleted()
-  }, [todos])
-
 
   // create all completed todos array
   const checkAllCompleted = () => {
@@ -155,6 +141,39 @@ export default function Dashboard() {
     setTodoValue(""); //resetting todo value in input
   };
 
+  // NEWLY ADDED
+  const deleteButtonHandler = async (newVariable: Todo) => {
+    console.log("FROM DASHBOARD", newVariable)
+    console.log('in delete button handler')
+    let id = newVariable._id; 
+
+    // find index of todo to remove based on id
+    let index = todos.findIndex(function (todo) {
+        return todo._id === id;
+    })
+
+    // update todo list
+    let updatedTodos = [...todos.slice(0, index), ...todos.slice(index + 1)]; // is this mutation?!
+
+    try {
+        const headers = new Headers()
+        headers.append('Authorization', `Bearer ${token}`)
+        headers.append('Content-Type', 'application/json')
+        const response = await fetch(`http://localhost:8080/tasks/${id}`, {
+            method: 'DELETE',
+            headers: headers
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok')
+        }
+        console.log('Single task successfully deleted')
+        setTodos(updatedTodos)
+    } catch (error) {
+        console.error('Error deleting single task: ', error)
+    }
+}
+
   const addTodo = async () => {
     try {
       const response = await fetch('http://localhost:8080/tasks', {
@@ -183,6 +202,52 @@ export default function Dashboard() {
     setTodoValue(event.currentTarget.value)
   }
 
+  const handleVariableChange = async (newVariable: Todo) => {
+    console.log('in dashboard!')
+    // setVariable(newVariable); // change this to TODO - SHOULD I DO THIS?
+    let id = newVariable._id;
+    newVariable.completed = !newVariable.completed;
+    console.log("NEW STATUS", newVariable.completed)
+
+    try {
+      const response = await fetch(`http://localhost:8080/tasks/${id}`, {
+        method: 'PATCH',
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ completed: newVariable.completed })
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok')
+      }
+      const todo = await response.json()
+      console.log('Task status successfully changed! HERE IS THE DATA', todo)
+
+      // find index of todo to remove based on id
+      let index = todos.findIndex(function (todo) {
+            return todo._id === id;
+        })
+      // UPDATED CODE - created a deep clone
+      let deepCloneUpdatedTodos = JSON.parse(JSON.stringify(todos)); // deep clone
+      deepCloneUpdatedTodos[index].completed = todo.completed; // this should be okay?! I'm not mutating the original array
+      
+      setTodos(deepCloneUpdatedTodos)
+      
+    } catch (error) {
+      console.log('Error in changing task status', error)
+    }
+  }
+
+  const handleLogout = () => {
+    axios.post('http://localhost:8080/users/logout', {}, config)
+    .then(response => {
+      localStorage.clear() // clear local storage
+      navigate('/login')
+    }).catch(err => console.log(err))
+  }
+
   // const handleLogout = async () => {
   //   try {
   //     const response = await fetch('http://localhost:8080/users/logout', {
@@ -192,29 +257,19 @@ export default function Dashboard() {
   //         Authorization: `Bearer ${token}`
   //       },
   //       body: JSON.stringify({})
-  //     });
+  //     })
 
-  //     if (!response.ok) {
-  //       throw new Error('Network response was not ok')
+  //     if(!response.ok) {
+  //       throw new Error('Something went wrong. Unable to logout.')
   //     }
 
   //     const responseData = await response.json()
-  //     console.log('Logged out successfully: ', responseData)
   //     localStorage.clear() // clear local storage
   //     navigate('/login')
   //   } catch (error) {
-  //     console.error('Error logging out: ', error)
+  //     console.log('There was an error logging out: ', error)
   //   }
   // }
-
-
-  const handleLogout = () => {
-    axios.post('http://localhost:8080/users/logout', {}, config)
-    .then(response => {
-      localStorage.clear() // clear local storage
-      navigate('/login')
-    }).catch(err => console.log(err))
-  }
 
   if (auth == "true") {
     return (
@@ -234,8 +289,11 @@ export default function Dashboard() {
             inputValue={todoValue}
           />
           <TodoList
+            // className="list" // is this correct?!
             todos={todos}
-            change={setTodos}
+            variable={todo}
+            onVariableChange={handleVariableChange}
+            deleteButtonHandler={deleteButtonHandler}
           />
           <SmallButton onClick={handleClearing} title="clear all completed" />
         </TodosWrapper>

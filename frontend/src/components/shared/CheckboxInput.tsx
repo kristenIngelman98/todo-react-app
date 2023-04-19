@@ -1,18 +1,32 @@
 import styled from 'styled-components';
+import { Todo } from '../../interfaces/Todo';
 
 interface Props {
   completed: boolean;
-  updateStatus: () => void;
-  deleteButtonHandler: () => void;
   className: string;
+  todo: Todo;
+  variable: Todo; // do i need both of these?
+  onVariableChange: (variable: Todo) => void;
 }
 
-const CheckboxInput = ({ completed, updateStatus, deleteButtonHandler, className }: Props) => {
+const CheckboxInput = ({ completed, 
+  className, todo,
+  onVariableChange, variable 
+}: Props) => {
+
+  // update this, change names, etc.
+  function updateVariable() {
+    const newVariable = todo;
+    console.log(newVariable)
+    onVariableChange(newVariable);
+  }
+
   return (
     <label className={className}>
       <input className="checkboxStatus" type="checkbox"
         defaultChecked={completed}
-        onChange={updateStatus} />
+        onChange={updateVariable}
+        />
       <span className="checkmark"></span>
     </label>
   )

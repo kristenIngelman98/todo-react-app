@@ -15,22 +15,27 @@ const FormWrapper = styled.div`
 
 interface Props extends HTMLProps<HTMLFormElement> {
     onInputChange: (event: ChangeEvent<HTMLInputElement>) => void;
+    // className: string;
 }
 
-const LoginUI = ({ onInputChange, ...props }: Props) => {
+const LoginUI = ({ onInputChange, className, ...props }: Props) => { // should I get ALL props? ...props?
     return (
         <>
         <Title className="page-title" title="Login" />
         <FormWrapper>
+            {/* <div className={className}> */}
             <form {...props}>
                 <Input className="input-field" onInputChange={onInputChange} placeholder="Email" type="email" />
                 <Input className="input-field" onInputChange={onInputChange} placeholder="Password" type="password" />
                 <Button className="bigbutton" title={"Login"} />
                 <Question question="Don't have an account?" action="Sign Up" link="/signup" />
             </form>
+            {/* </div> */}
         </FormWrapper>
         </>
     )
 }
+
+
 
 export default LoginUI;

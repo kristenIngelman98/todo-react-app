@@ -58,38 +58,12 @@ const Login = () => {
     }
   }
 
-  // const handleLoginButtonPress = (event: FormEvent<HTMLFormElement>) => {
-  //   event.preventDefault();
-
-
-  //   // login
-  //   axios.post('http://localhost:8080/users/login', user)
-  //     .then(response => {
-  //       if (response.status === 200) { // successful
-  //         // setIsLoggedIn(true)
-  //         localStorage.setItem('token', response.data.token)
-  //         localStorage.setItem("authenticated", "true")
-  //         navigate('/dashboard');
-  //       } else {
-  //         return
-  //       }
-  //     }).catch((error => {
-  //       localStorage.setItem('authenticated', 'false')
-  //       // setIsLoggedIn(false)
-  //       setError('Unable to login. Please try again!')
-  //     }))
-  //   // reset input values  
-  //   setUser({
-  //     email: '',
-  //     password: ''
-  //   })
-  // }
-
   return (
     <>
       <LoginUI
         onInputChange={handleLogin}
         onSubmit={handleLoginButtonPress}
+        // className={className}
       />
       {error ? <Alert color="danger">{error}</Alert> : ''}
     </>
